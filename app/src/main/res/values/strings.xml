@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">LIBroom</string>
+    <string name="app_slogan">All you need</string>
+
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="favorites">Favorites</string>
+    <string name="profile">Profile</string>
+    <string name="arrow_back">Arrow Back</string>
+
+    <string name="discover_books">Discover Books</string>
+    <string name="my_bookshelf">My bookshelf</string>
+
+    <string name="recommended">Recommended</string>
+    <string name="recently_read">Recently read</string>
+    <string name="popular">Popular</string>
+    <string name="top_authors">Top Authors</string>
+    <string name="top_categories">Top Categories</string>
+    <string name="more">More</string>
+    <string name="next">Next</string>
+    <string name="get_started">Get Started</string>
+    <string name="skip">Skip</string>
+    <string name="search_box_placeholder">Titles, authors, or topics</string>
+    <string name="today_reading">Today\'s Reading</string>
+    <string name="listened_hours">Listened hours\nthis month</string>
+    <string name="pages_read">Pages read\nthis month</string>
+    <string name="reads">Reads</string>
+    <string name="pages">Pages</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="chapters">Chapters</string>
+    <string name="tap_chapter">Tap on a chapter to start reading.</string>
+
+    <string name="oops">Oops!</string>
+    <string name="try_again">Try Again</string>
+    <string name="something_wrong">We are sorry about something went wrong</string>
+
+<!--    todo: delete it in feature-->
+    <string name="lorem_text">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </string>
+    <string name="login_screen_title">Login to your Account</string>
+    <string name="hint_email">your@email.com</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="login_success">Login Success</string>
+    <string name="retry_login">Retry Login</string>
+    <string name="forgot_password">Forget Password?</string>
+</resources>
