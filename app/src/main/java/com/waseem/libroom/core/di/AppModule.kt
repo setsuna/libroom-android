@@ -5,7 +5,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.waseem.libroom.core.token.TokenManager
 import com.waseem.libroom.feature.author.data.AuthorRepositoryImpl
 import com.waseem.libroom.feature.author.domain.AuthorRepository
 import com.waseem.libroom.feature.book.data.BookRepositoryImpl
@@ -15,6 +14,10 @@ import com.waseem.libroom.feature.category.domain.CategoryRepository
 import com.waseem.libroom.feature.root.data.DeviceInfoRepositoryImpl
 import com.waseem.libroom.feature.root.data.UserPreferenceRepositoryImpl
 import com.waseem.libroom.feature.root.device.DeviceDataRepository
+import com.waseem.libroom.feature.root.device.GetDeviceInfo
+import com.waseem.libroom.feature.root.device.GetDeviceInfoImpl
+import com.waseem.libroom.feature.root.device.UpdateDeviceInfo
+import com.waseem.libroom.feature.root.device.UpdateDeviceInfoImpl
 import com.waseem.libroom.feature.root.domain.GetAuthState
 import com.waseem.libroom.feature.root.domain.GetAuthStateImpl
 import com.waseem.libroom.feature.root.domain.UpdateAuthState
@@ -91,7 +94,8 @@ object AppModule {
         return DeviceInfoRepositoryImpl(dataStore)
     }
 
-    fun prvideDeviceInfo(deviceInfoRepository: DeviceDataRepository): GetDeviceInfo {
+    @Provides
+    fun provideGetDeviceInfo(deviceInfoRepository: DeviceDataRepository): GetDeviceInfo {
         return GetDeviceInfoImpl(deviceInfoRepository)
     }
 
@@ -100,9 +104,4 @@ object AppModule {
         return UpdateDeviceInfoImpl(deviceInfoRepository)
     }
 
-    @Provides
-    @Singleton
-    fun provideTokenManager(@ApplicationContext context: Context): TokenManager {
-        return TokenManager(context)
-    }
 }

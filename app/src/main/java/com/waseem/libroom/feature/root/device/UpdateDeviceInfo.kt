@@ -10,7 +10,7 @@ interface UpdateDeviceInfo : UseCase<Unit, UpdateDeviceInfo.Params> {
 class UpdateDeviceInfoImpl(
     private val deviceDataRepository: DeviceDataRepository
 ) : UpdateDeviceInfo {
-    override suspend fun invoke(params: UpdateAuthState.Params): Result<Unit> {
-        return Result.success(userPreferenceRepository.setAuthState(params.authState))
+    override suspend fun invoke(params: UpdateDeviceInfo.Params): Result<Unit> {
+        return Result.success(deviceDataRepository.setDeviceInfo(params.deviceInfo))
     }
 }

@@ -20,13 +20,9 @@ class DeviceInfoRepositoryImpl @Inject constructor(
     private val preferenceDataStore: DataStore<Preferences>
 ) : DeviceDataRepository {
     override fun getDeviceInfo(): Flow<DeviceInfo> = preferenceDataStore.data.map { preferences ->
-        val deviceId = preferences[DeviceInfoKeys.DEVICE_ID]
-        val token = preferences[DeviceInfoKeys.DEVICE_TOKEN]
-        if (deviceId != null && token != null) {
-            DeviceInfo(deviceId, token)
-        } else {
-            null
-        }
+        val deviceId = preferences[DeviceInfoKeys.DEVICE_ID]?:0
+        val token = preferences[DeviceInfoKeys.DEVICE_TOKEN]?:""
+        DeviceInfo(deviceId, token)
     }
 
     override suspend fun setDeviceInfo(deviceInfo: DeviceInfo) {
