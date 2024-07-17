@@ -4,25 +4,35 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.waseem.libroom.feature.root.device.DeviceInfo
-import com.waseem.libroom.feature.root.domain.DeviceDataRepository
+import com.waseem.libroom.feature.root.device.DeviceDataRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-object PreferencesKeys1 {
-    val deviceInfo = intPreferencesKey("device_info")
+object DeviceInfoKeys {
+    val DEVICE_ID = intPreferencesKey("device_id")
+    val DEVICE_TOKEN = stringPreferencesKey("device_token")
 }
 
 class DeviceInfoRepositoryImpl @Inject constructor(
     private val preferenceDataStore: DataStore<Preferences>
-) : DeviceDataRepository{
-
-    override fun getDeviceState(): Flow<DeviceInfo> {
-        TODO("Not yet implemented")
+) : DeviceDataRepository {
+    override fun getDeviceInfo(): Flow<DeviceInfo> = preferenceDataStore.data.map { preferences ->
+        val deviceId = preferences[DeviceInfoKeys.DEVICE_ID]
+        val token = preferences[DeviceInfoKeys.DEVICE_TOKEN]
+        if (deviceId != null && token != null) {
+            DeviceInfo(deviceId, token)
+        } else {
+            null
+        }
     }
 
-    override suspend fun setDeviceState(deviceInfo: DeviceInfo) {
-        TODO("Not yet implemented")
+    override suspend fun setDeviceInfo(deviceInfo: DeviceInfo) {
+        preferenceDataStore.edit { preferences ->
+            preferences[DeviceInfoKeys.DEVICE_ID] = deviceInfo.deviceId
+            preferences[DeviceInfoKeys.DEVICE_TOKEN] = deviceInfo.token
+        }
     }
 }

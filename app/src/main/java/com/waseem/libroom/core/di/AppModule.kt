@@ -13,9 +13,8 @@ import com.waseem.libroom.feature.book.domain.BookRepository
 import com.waseem.libroom.feature.category.data.CategoryRepositoryImpl
 import com.waseem.libroom.feature.category.domain.CategoryRepository
 import com.waseem.libroom.feature.root.data.DeviceInfoRepositoryImpl
-import com.waseem.libroom.feature.root.data.PreferencesKeys1
 import com.waseem.libroom.feature.root.data.UserPreferenceRepositoryImpl
-import com.waseem.libroom.feature.root.domain.DeviceDataRepository
+import com.waseem.libroom.feature.root.device.DeviceDataRepository
 import com.waseem.libroom.feature.root.domain.GetAuthState
 import com.waseem.libroom.feature.root.domain.GetAuthStateImpl
 import com.waseem.libroom.feature.root.domain.UpdateAuthState
@@ -88,10 +87,18 @@ object AppModule {
     }
 
     @Provides
-    fun provideDeviceInfoRepository(dataStore: DataStore<Preferences>):DeviceDataRepository{
+    fun provideDeviceInfoRepository(dataStore: DataStore<Preferences>): DeviceDataRepository {
         return DeviceInfoRepositoryImpl(dataStore)
     }
 
+    fun prvideDeviceInfo(deviceInfoRepository: DeviceDataRepository): GetDeviceInfo {
+        return GetDeviceInfoImpl(deviceInfoRepository)
+    }
+
+    @Provides
+    fun provideUpdateDeviceInfo(deviceInfoRepository: DeviceDataRepository): UpdateDeviceInfo {
+        return UpdateDeviceInfoImpl(deviceInfoRepository)
+    }
 
     @Provides
     @Singleton
