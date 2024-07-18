@@ -1,6 +1,6 @@
 package com.waseem.libroom.feature.auth.data
 
-import com.waseem.libroom.feature.auth.domain.AuthWithPasswordRepository
+import com.waseem.libroom.feature.auth.domain.AuthWithPWDRepository
 import com.waseem.libroom.feature.auth.domain.LoginCredentials
 import com.waseem.libroom.feature.auth.domain.MeetingUser
 import com.waseem.libroom.utils.EncryptionUtils
@@ -11,10 +11,11 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import javax.inject.Inject
 
-class ApiAuthRepositoryImpl(
+class AuthWithPWDRepositoryImpl @Inject constructor(
     private val httpClient: HttpClient
-): AuthWithPasswordRepository {
+): AuthWithPWDRepository {
     override suspend fun signIn(email: String, password: String): Result<MeetingUser> {
         return try {
             val response = httpClient.post("http://wzh.xunyidi.cn/api/user-service/user/login") {

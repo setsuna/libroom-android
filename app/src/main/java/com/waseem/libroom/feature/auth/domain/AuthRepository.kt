@@ -5,7 +5,7 @@ interface AuthRepository {
     suspend fun signOut(): Result<Boolean>
 }
 
-interface AuthWithPasswordRepository {
+interface AuthWithPWDRepository {
     suspend fun signIn(email: String, password: String): Result<MeetingUser>
     suspend fun signOut(): Result<Boolean>
 }
