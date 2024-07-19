@@ -73,7 +73,8 @@ dependencies {
     implementation 'io.ktor:ktor-client-android:2.3.12'
     implementation 'io.ktor:ktor-client-content-negotiation:2.3.12'
     implementation 'io.ktor:ktor-serialization-kotlinx-json:2.3.12'
-
+    implementation 'io.ktor:ktor-client-core:3.0.0-beta-2'
+    implementation 'io.ktor:ktor-client-logging:3.0.0-beta-2'
     //coil
     implementation "io.coil-kt:coil:$coil_version"
     implementation "io.coil-kt:coil-compose:$coil_version"
