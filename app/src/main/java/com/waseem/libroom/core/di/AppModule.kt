@@ -61,6 +61,7 @@ object AppModule {
     fun providePreferenceDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create {
             context.preferencesDataStoreFile("user_prefs")
+            //context.preferencesDataStoreFile("device_info")
         }
     }
 
@@ -80,7 +81,7 @@ object AppModule {
     fun provideUpdateAuthState(userPreferenceRepository: UserPreferenceRepository): UpdateAuthState {
         return UpdateAuthStateImpl(userPreferenceRepository)
     }
-
+/**
     @Provides
     @Singleton
     fun provideDeviceInfoDataStore(@ApplicationContext context: Context):DataStore<Preferences>{
@@ -88,7 +89,7 @@ object AppModule {
             context.preferencesDataStoreFile("device_info")
         }
     }
-
+**/
     @Provides
     fun provideDeviceInfoRepository(dataStore: DataStore<Preferences>): DeviceDataRepository {
         return DeviceInfoRepositoryImpl(dataStore)

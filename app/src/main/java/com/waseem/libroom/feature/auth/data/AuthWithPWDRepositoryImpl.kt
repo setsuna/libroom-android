@@ -16,11 +16,11 @@ import javax.inject.Inject
 class AuthWithPWDRepositoryImpl @Inject constructor(
     private val httpClient: HttpClient
 ): AuthWithPWDRepository {
-    override suspend fun signIn(email: String, password: String): Result<MeetingUser> {
+    override suspend fun signInPWD(username: String, password: String): Result<MeetingUser> {
         return try {
             val response = httpClient.post("http://wzh.xunyidi.cn/api/user-service/user/login") {
                 contentType(ContentType.Application.Json)
-                setBody(LoginCredentials(email, EncryptionUtils.md5(password)))
+                setBody(LoginCredentials(username, EncryptionUtils.md5(password)))
             }
             if (response.status.isSuccess()) {
                 Result.success(response.body<MeetingUser>())
@@ -32,7 +32,8 @@ class AuthWithPWDRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signOut(): Result<Boolean> {
-        TODO("Not yet implemented")
+
+    override suspend fun signOutPWD(): Result<Boolean> {
+        return Result.success(true)
     }
 }

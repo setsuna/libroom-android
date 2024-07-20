@@ -7,8 +7,12 @@ import com.waseem.libroom.feature.auth.domain.AuthRepository
 import com.waseem.libroom.feature.auth.domain.AuthWithPWDRepository
 import com.waseem.libroom.feature.auth.domain.SignInWithEmailPassword
 import com.waseem.libroom.feature.auth.domain.SignInWithEmailPasswordImpl
+import com.waseem.libroom.feature.auth.domain.SignInWithPassword
+import com.waseem.libroom.feature.auth.domain.SignInWithPasswordImpl
 import com.waseem.libroom.feature.auth.domain.SignOut
 import com.waseem.libroom.feature.auth.domain.SignOutImpl
+import com.waseem.libroom.feature.auth.domain.SignOutPWD
+import com.waseem.libroom.feature.auth.domain.SignOutPWDImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,8 +42,23 @@ object AuthModule {
         authRepository: AuthRepository
     ): SignOut = SignOutImpl(authRepository = authRepository)
 
+    //修改密码登录
     @Provides
-    fun provideApiAuthRepository(httpClient: HttpClient):AuthWithPWDRepository {
+    fun provideAuthWithPWDRepository(httpClient: HttpClient):AuthWithPWDRepository{
         return AuthWithPWDRepositoryImpl(httpClient)
     }
+
+    @Provides
+    fun provideSignInWithPassword(
+        dispatcher: CoroutineDispatcher,
+        authWithPWDRepository: AuthWithPWDRepository
+    ):SignInWithPassword {
+        return SignInWithPasswordImpl(dispatcher = dispatcher,authWithPWDRepository = authWithPWDRepository)
+    }
+
+    @Provides
+    fun provideSignOutPWD(
+        authWithPWDRepository: AuthWithPWDRepository
+    ):SignOutPWD = SignOutPWDImpl(authWithPWDRepository = authWithPWDRepository)
+
 }

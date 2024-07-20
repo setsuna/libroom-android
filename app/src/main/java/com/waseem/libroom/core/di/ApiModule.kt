@@ -17,7 +17,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
-import org.slf4j.helpers.Util
 import javax.inject.Singleton
 
 @Module
@@ -49,8 +48,9 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideApiService(httpClient: HttpClient):ApiService=ApiServiceImpl(httpClient)
-**/
+
 
     @Provides
     fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default
+ **/
 }
