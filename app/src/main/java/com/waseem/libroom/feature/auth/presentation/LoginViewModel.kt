@@ -1,7 +1,7 @@
 package com.waseem.libroom.feature.auth.presentation
 
 import com.waseem.libroom.core.BaseStateViewModel
-import com.waseem.libroom.feature.auth.domain.SignInWithEmailPassword
+import com.waseem.libroom.feature.auth.domain.SignInWithPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -11,7 +11,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val signInWithEmailPassword: SignInWithEmailPassword,
+    //private val signInWithEmailPassword: SignInWithEmailPassword,
+    private val signInWithPassword: SignInWithPassword,
     reducer: LoginReducer
 ) : BaseStateViewModel<LoginAction, LoginResult, LoginEvent, LoginState, LoginReducer>(
     initialState = LoginState.DefaultState,
@@ -21,9 +22,9 @@ class LoginViewModel @Inject constructor(
         return when(this) {
             is LoginAction.SignInClick -> {
                 flow {
-                    signInWithEmailPassword(
-                        params = SignInWithEmailPassword.Params(
-                            email = email,
+                    signInWithPassword(
+                        params = SignInWithPassword.Params(
+                            account = email,
                             password = password
                         )
                     ).onSuccess {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface SignInWithPassword: UseCase<MeetingUser,SignInWithPassword.Params> {
-    data class Params(val username: String, val password: String)
+    data class Params(val account: String, val password: String)
 }
 
 class SignInWithPasswordImpl(
@@ -14,7 +14,7 @@ class SignInWithPasswordImpl(
 ):SignInWithPassword{
     override suspend fun invoke(params: SignInWithPassword.Params): Result<MeetingUser> {
         return withContext(dispatcher) {
-            authWithPWDRepository.signInPWD(params.username,params.password)
+            authWithPWDRepository.signInPWD(params.account,params.password)
         }
     }
 

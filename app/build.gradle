@@ -1,9 +1,11 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
     id 'com.google.gms.google-services'
+    id 'kotlin-android'
 }
 
 android {
@@ -13,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.waseem.libroom"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -70,11 +72,11 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     //ktor
-    implementation 'io.ktor:ktor-client-android:2.3.12'
-    implementation 'io.ktor:ktor-client-content-negotiation:2.3.12'
-    implementation 'io.ktor:ktor-serialization-kotlinx-json:2.3.12'
-    implementation 'io.ktor:ktor-client-core:3.0.0-beta-2'
-    implementation 'io.ktor:ktor-client-logging:3.0.0-beta-2'
+    implementation "io.ktor:ktor-client-android:$ktor_version"
+    implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+    implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-logging:$ktor_version"
     //coil
     implementation "io.coil-kt:coil:$coil_version"
     implementation "io.coil-kt:coil-compose:$coil_version"
