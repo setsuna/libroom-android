@@ -9,10 +9,13 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.waseem.libroom.core.ui.theme.LIBroomTheme
+import com.waseem.libroom.feature.auth.presentation.ErrorScreen
+import com.waseem.libroom.feature.auth.presentation.LoadingScreen
 import com.waseem.libroom.feature.auth.presentation.LoginScreen
 import com.waseem.libroom.feature.onboarding.presentation.OnboardingScreen
 import com.waseem.libroom.feature.root.MainScreen
@@ -31,35 +34,46 @@ class MainActivity : ComponentActivity() {
         }
 
         actionBar?.hide()
-
+        viewModel.initialize()
         setContent {
             LIBroomTheme {
-                Crossfade(targetState = viewModel.authState.value, label = "scene") { state ->
-                    when(state) {
-                        AuthState.ONBOARDING -> {
-                            OnboardingScreen(
-                                viewModel = hiltViewModel(),
-                                gotoAuth = {
-                                    viewModel.setAuthState(AuthState.UNAUTHENTICATED)
+                val initState by viewModel.initState
+                val authState by viewModel.authState
+                when (initState){
+                    MainViewModel.InitState.Loading ->{
+                        LoadingScreen()
+                    }
+                    MainViewModel.InitState.Completed ->{
+                        Crossfade(targetState = viewModel.authState.value, label = "scene") { state ->
+                            when(state) {
+                                AuthState.ONBOARDING -> {
+                                    OnboardingScreen(
+                                        viewModel = hiltViewModel(),
+                                        gotoAuth = {
+                                            viewModel.setAuthState(AuthState.UNAUTHENTICATED)
+                                        }
+                                    )
                                 }
-                            )
-                        }
-                        AuthState.UNAUTHENTICATED -> {
-                            LoginScreen(viewModel = hiltViewModel()) {
-                                viewModel.setAuthState(AuthState.AUTHENTICATED)
-                            }
-                        }
-                        AuthState.AUTHENTICATED -> {
-                            MainScreen()
-                        }
-                        else -> {
-                            Scaffold {
-                                Box(modifier = Modifier.padding(it))
+                                AuthState.UNAUTHENTICATED -> {
+                                    LoginScreen(viewModel = hiltViewModel()) {
+                                        viewModel.setAuthState(AuthState.AUTHENTICATED)
+                                    }
+                                }
+                                AuthState.AUTHENTICATED -> {
+                                    MainScreen()
+                                }
+                                else -> {
+                                    Scaffold {
+                                        Box(modifier = Modifier.padding(it))
+                                    }
+                                }
                             }
                         }
                     }
+                    is MainViewModel.InitState.Error ->{
+                        ErrorScreen((initState as MainViewModel.InitState.Error).message)
+                    }
                 }
-
             }
         }
     }

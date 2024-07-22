@@ -24,4 +24,7 @@ object EncryptionUtils {
     private fun ByteArray.toHex(): String {
         return joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
     }
+    fun ByteArray.toHexString(): String {
+        return joinToString("") { "%02x".format(it) }
+    }
 }
