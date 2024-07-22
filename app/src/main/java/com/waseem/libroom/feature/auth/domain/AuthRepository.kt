@@ -6,6 +6,6 @@ interface AuthRepository {
 }
 
 interface AuthWithPWDRepository {
-    suspend fun signInPWD(username: String, password: String): Result<MeetingUser>
+    suspend fun signInPWD(username: String, password: String): Result<Meeting>
     suspend fun signOutPWD(): Result<Boolean>
 }
