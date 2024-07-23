@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.waseem.libroom.core.usecase.NoParams
 import com.waseem.libroom.feature.root.device.DeviceInfo
 import com.waseem.libroom.feature.root.device.DeviceType
+import com.waseem.libroom.feature.root.device.GetDeviceInfo
 import com.waseem.libroom.feature.root.device.UpdateDeviceInfo
 import com.waseem.libroom.feature.root.domain.AuthState
 import com.waseem.libroom.feature.root.domain.GetAuthState
@@ -30,21 +31,14 @@ import com.waseem.libroom.utils.EncryptionUtils.toHexString
 @HiltViewModel
 class MainViewModel @Inject constructor(
     getAuthState: GetAuthState,
+    getDeviceInfo: GetDeviceInfo,
     private val updateAuthState: UpdateAuthState,
     private val updateDeviceInfo: UpdateDeviceInfo,
     private val httpClient: HttpClient
 ) : ViewModel() {
     private val _authState = mutableStateOf(AuthState.UNKNOWN)
     val authState : State<AuthState> = _authState
-    //配置初始化
-    sealed class InitState {
-        object Loading : InitState()
-        object Completed : InitState()
-        data class Error(val message: String) : InitState()
-    }
 
-    private val _initState = mutableStateOf<InitState>(InitState.Loading)
-    val initState: State<InitState> = _initState
 
 
     init {
