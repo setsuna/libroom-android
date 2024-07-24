@@ -6,4 +6,6 @@ interface DeviceDataRepository {
     fun getDeviceInfo(): Flow<DeviceInfo>
 
     suspend fun setDeviceInfo(deviceInfo: DeviceInfo)
+
+    suspend fun getDeviceInfoByApi(): DeviceInfo
 }
