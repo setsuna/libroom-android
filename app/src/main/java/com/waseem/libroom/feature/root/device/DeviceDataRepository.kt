@@ -7,5 +7,4 @@ interface DeviceDataRepository {
 
     suspend fun setDeviceInfo(deviceInfo: DeviceInfo)
 
-    suspend fun getDeviceInfoByApi(): DeviceInfo
 }

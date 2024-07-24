@@ -4,6 +4,7 @@ import android.util.Log
 import com.waseem.libroom.feature.auth.domain.AuthWithPWDRepository
 import com.waseem.libroom.feature.auth.domain.LoginCredentials
 import com.waseem.libroom.feature.auth.domain.Meeting
+import com.waseem.libroom.feature.root.device.DeviceInfo
 import com.waseem.libroom.utils.EncryptionUtils
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -42,5 +43,28 @@ class AuthWithPWDRepositoryImpl @Inject constructor(
 
     override suspend fun signOutPWD(): Result<Boolean> {
         return Result.success(true)
+    }
+
+    override suspend fun updateDeviceToken(
+        deviceType: String,
+        deviceCode: String
+    ): Result<DeviceInfo> {
+        return try {
+            val response = httpClient.post("/api/device-service/devices/token") {
+                contentType(ContentType.Application.Json)
+                setBody(mapOf(
+                    "code" to deviceCode,
+                    "typeEnum" to deviceType
+                ))
+            }
+            println("getDeviceToken response:${deviceType}| ${response.bodyAsText()}")
+            if (response.status.isSuccess()) {
+                Result.success(response.body<DeviceInfo>())
+            } else {
+                throw Exception("获取设备令牌失败: ${response.bodyAsText()}")
+            }
+        } catch (e: Exception) {
+            throw Exception("网络请求失败: ${e.message}")
+        }
     }
 }

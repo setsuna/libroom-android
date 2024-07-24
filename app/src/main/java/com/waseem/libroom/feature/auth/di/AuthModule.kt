@@ -13,6 +13,9 @@ import com.waseem.libroom.feature.auth.domain.SignOut
 import com.waseem.libroom.feature.auth.domain.SignOutImpl
 import com.waseem.libroom.feature.auth.domain.SignOutPWD
 import com.waseem.libroom.feature.auth.domain.SignOutPWDImpl
+import com.waseem.libroom.feature.auth.domain.UpdateDeviceToken
+import com.waseem.libroom.feature.auth.domain.UpdateDeviceTokenImpl
+import com.waseem.libroom.feature.auth.presentation.LoginAction
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,7 +45,7 @@ object AuthModule {
         authRepository: AuthRepository
     ): SignOut = SignOutImpl(authRepository = authRepository)
 
-    //修改密码登录
+    //账号密码登录
     @Provides
     fun provideAuthWithPWDRepository(httpClient: HttpClient):AuthWithPWDRepository{
         return AuthWithPWDRepositoryImpl(httpClient)
@@ -61,4 +64,10 @@ object AuthModule {
         authWithPWDRepository: AuthWithPWDRepository
     ):SignOutPWD = SignOutPWDImpl(authWithPWDRepository = authWithPWDRepository)
 
+    fun provideUpdateDeviceToken(
+        dispatcher: CoroutineDispatcher,
+        authWithPWDRepository: AuthWithPWDRepository
+    ):UpdateDeviceToken{
+        return UpdateDeviceTokenImpl(dispatcher = dispatcher,authWithPWDRepository = authWithPWDRepository)
+    }
 }

@@ -25,8 +25,7 @@ object DeviceInfoKeys {
 }
 
 class DeviceInfoRepositoryImpl @Inject constructor(
-    private val preferenceDataStore: DataStore<Preferences>,
-    private val httpClient: HttpClient
+    private val preferenceDataStore: DataStore<Preferences>
 ) : DeviceDataRepository {
     override fun getDeviceInfo(): Flow<DeviceInfo> = preferenceDataStore.data.map { preferences ->
         val deviceId = preferences[DeviceInfoKeys.DEVICE_ID]?:0
@@ -38,25 +37,6 @@ class DeviceInfoRepositoryImpl @Inject constructor(
         preferenceDataStore.edit { preferences ->
             preferences[DeviceInfoKeys.DEVICE_ID] = deviceInfo.deviceId
             preferences[DeviceInfoKeys.DEVICE_TOKEN] = deviceInfo.token
-        }
-    }
-    override suspend fun getDeviceInfoByApi(): DeviceInfo {
-        return try {
-            val response = httpClient.post("/api/device-service/devices/token") {
-                contentType(ContentType.Application.Json)
-                setBody(mapOf(
-                    "deviceCode" to deviceCode,
-                    "deviceType" to deviceType.toString()
-                ))
-            }
-            println("getDeviceToken response:${deviceType.name}| ${response.bodyAsText()}")
-            if (response.status.isSuccess()) {
-                response.body<DeviceInfo>()
-            } else {
-                throw Exception("获取设备令牌失败: ${response.bodyAsText()}")
-            }
-        } catch (e: Exception) {
-            throw Exception("网络请求失败: ${e.message}")
         }
     }
 }
