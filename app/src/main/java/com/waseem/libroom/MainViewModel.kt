@@ -27,11 +27,12 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 import com.waseem.libroom.utils.EncryptionUtils.toHexString
+import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     getAuthState: GetAuthState,
-    getDeviceInfo: GetDeviceInfo,
+    private val getDeviceInfo: GetDeviceInfo,
     private val updateAuthState: UpdateAuthState,
     private val updateDeviceInfo: UpdateDeviceInfo,
     private val httpClient: HttpClient
@@ -39,12 +40,25 @@ class MainViewModel @Inject constructor(
     private val _authState = mutableStateOf(AuthState.UNKNOWN)
     val authState : State<AuthState> = _authState
 
-
-
     init {
         viewModelScope.launch {
             getAuthState(NoParams).collect {
                 _authState.value = it
+                if(it == AuthState.UNAUTHENTICATED){
+                    checkDeviceAuthorization()
+                }
+            }
+        }
+    }
+    fun checkDeviceAuthorization() {
+        viewModelScope.launch {
+            try {
+                val deviceInfo = getDeviceInfo(NoParams).first()
+                updateDeviceInfo(UpdateDeviceInfo.Params(getDeviceInfo()))
+                // If successful, keep the state as UNAUTHENTICATED to show LoginScreen
+            } catch (e: Exception) {
+                // If token update fails, set state to DEVICE_UNAUTHORIZED
+                setAuthState(AuthState.DEVICE_UNAUTHORIZED)
             }
         }
     }
@@ -55,17 +69,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadConfigurations() {
-        val deviceCode = getUniqueDeviceCode()
-        val deviceType = getDeviceType()
-        try {
-            val deviceInfo = getDeviceToken(deviceCode, deviceType)
-            updateDeviceInfo(UpdateDeviceInfo.Params(deviceInfo))
-        } catch (e: Exception) {
-            // 处理错误，可能需要设置错误状态
-            _initState.value = InitState.Error("获取设备信息失败: ${e.message}")
-        }
-    }
     private fun getUniqueDeviceCode(): String {
         val WIDEVINE_UUID = UUID(-0x121074568629b532L, -0x5c37d8232ae2de13L)
         return try {
@@ -92,7 +95,9 @@ class MainViewModel @Inject constructor(
         return DeviceType.CLIENT_DESKCARD
     }
 
-    private suspend fun getDeviceToken(deviceCode: String, deviceType: DeviceType): DeviceInfo {
+    private suspend fun getDeviceInfo(): DeviceInfo {
+        val deviceCode = getUniqueDeviceCode()
+        val deviceType = getDeviceType()
         return try {
             val response = httpClient.post("/api/device-service/devices/token") {
                 contentType(ContentType.Application.Json)
@@ -109,20 +114,6 @@ class MainViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             throw Exception("网络请求失败: ${e.message}")
-        }
-    }
-
-    fun initialize() {
-        viewModelScope.launch {
-            _initState.value = InitState.Loading
-            try {
-                // 执行初始化操作，例如加载配置
-                // 这里假设有一个 loadConfigurations() 挂起函数
-                loadConfigurations()
-                _initState.value = InitState.Completed
-            } catch (e: Exception) {
-                _initState.value = InitState.Error(e.message ?: "初始化失败")
-            }
         }
     }
 }
