@@ -1,6 +1,8 @@
 package com.waseem.libroom.feature.auth.data
 
 import android.util.Log
+import com.waseem.libroom.core.usecase.ApiResponse
+import com.waseem.libroom.core.usecase.toResult
 import com.waseem.libroom.feature.auth.domain.AuthWithPWDRepository
 import com.waseem.libroom.feature.auth.domain.LoginCredentials
 import com.waseem.libroom.feature.auth.domain.Meeting
@@ -28,15 +30,10 @@ class AuthWithPWDRepositoryImpl @Inject constructor(
                 contentType(ContentType.Application.Json)
                 setBody(loginCredentials)
             }
-            if (response.status.isSuccess()) {
-                Result.success(response.body<Meeting>())
-            } else {
-                val errorBody = response.bodyAsText()
-                println("Error response: $errorBody")
-                Result.failure(Exception("Login failed: ${response.bodyAsText()}"))
-            }
+            val responseBody = response.body<ApiResponse<Meeting>>()
+            responseBody.toResult()
         } catch (e: Exception) {
-            return Result.failure(e)
+            Result.failure(Exception("网络请求失败: ${e.message}"))
         }
     }
 
@@ -58,13 +55,12 @@ class AuthWithPWDRepositoryImpl @Inject constructor(
                 ))
             }
             println("getDeviceToken response:${deviceType}| ${response.bodyAsText()}")
-            if (response.status.isSuccess()) {
-                Result.success(response.body<DeviceInfo>())
-            } else {
-                throw Exception("获取设备令牌失败: ${response.bodyAsText()}")
-            }
+
+            val responseBody = response.body<ApiResponse<DeviceInfo>>()
+            responseBody.toResult()
+
         } catch (e: Exception) {
-            throw Exception("网络请求失败: ${e.message}")
+            Result.failure(Exception("网络请求失败: ${e.message}"))
         }
     }
 }

@@ -53,8 +53,14 @@ class MainViewModel @Inject constructor(
     fun checkDeviceAuthorization() {
         viewModelScope.launch {
             try {
-                updateDeviceToken(UpdateDeviceToken.Params(EncryptionUtils.getDeviceType().toString(),EncryptionUtils.getUniqueDeviceCode()))
+                val result = updateDeviceToken(UpdateDeviceToken.Params(EncryptionUtils.getDeviceType().toString(),EncryptionUtils.getUniqueDeviceCode()))
                 // If successful, keep the state as UNAUTHENTICATED to show LoginScreen
+                when {
+                    result.isSuccess -> {
+                        val deviceInfo = result.getOrNull()
+
+                    }
+                }
             } catch (e: Exception) {
                 // If token update fails, set state to DEVICE_UNAUTHORIZED
                 setAuthState(AuthState.DEVICE_UNAUTHORIZED)
