@@ -8,7 +8,7 @@ interface AuthRepository {
 }
 
 interface AuthWithPWDRepository {
-    suspend fun signInPWD(username: String, password: String): Result<Meeting>
+    suspend fun signInPWD(username: String, password: String): Result<List<Meeting>>
     suspend fun signOutPWD(): Result<Boolean>
     suspend fun updateDeviceToken(deviceType:String,deviceCode:String):Result<DeviceInfo>
 }

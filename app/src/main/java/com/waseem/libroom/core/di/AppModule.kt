@@ -16,6 +16,7 @@ import com.waseem.libroom.feature.root.data.UserPreferenceRepositoryImpl
 import com.waseem.libroom.feature.root.device.DeviceDataRepository
 import com.waseem.libroom.feature.root.device.GetDeviceInfo
 import com.waseem.libroom.feature.root.device.GetDeviceInfoImpl
+import com.waseem.libroom.feature.root.device.UniqueIdManager
 import com.waseem.libroom.feature.root.device.UpdateDeviceInfo
 import com.waseem.libroom.feature.root.device.UpdateDeviceInfoImpl
 import com.waseem.libroom.feature.root.domain.GetAuthState
@@ -105,4 +106,9 @@ object AppModule {
         return UpdateDeviceInfoImpl(deviceInfoRepository)
     }
 
+    @Provides
+    @Singleton
+    fun provideUniqueIdManager(@ApplicationContext context: Context): UniqueIdManager {
+        return UniqueIdManager(context)
+    }
 }

@@ -2,6 +2,7 @@ package com.waseem.libroom.feature.auth.data
 
 import android.util.Log
 import com.waseem.libroom.core.usecase.ApiResponse
+import com.waseem.libroom.core.usecase.ApiResponseList
 import com.waseem.libroom.core.usecase.NoParams
 import com.waseem.libroom.core.usecase.toResult
 import com.waseem.libroom.feature.auth.domain.AuthWithPWDRepository
@@ -15,29 +16,47 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
 class AuthWithPWDRepositoryImpl @Inject constructor(
     private var httpClient: HttpClient,
     private var getDeviceInfo: GetDeviceInfo
 ): AuthWithPWDRepository {
-    override suspend fun signInPWD(username: String, password: String): Result<Meeting> {
+    override suspend fun signInPWD(username: String, password: String): Result<List<Meeting>> {
         val deviceInfo = getDeviceInfo(NoParams).first()
         val loginCredentials = LoginCredentials(deviceInfo.token,username, EncryptionUtils.encryptPassword(password))
-        println("Request body: ${loginCredentials.toString()}")
-        Log.d("TAG", "Your message here $loginCredentials")
         return try {
             val response = httpClient.post("/api/meeting-service/meeting_user_token/login") {
                 contentType(ContentType.Application.Json)
                 setBody(loginCredentials)
             }
-            val responseBody = response.body<ApiResponse<Meeting>>()
-            responseBody.toResult()
+            // 先解析 code
+            val jsonElement = Json.parseToJsonElement(response.bodyAsText())
+            val code = jsonElement.jsonObject["code"]?.jsonPrimitive?.int
+
+            when (code) {
+                0 -> {
+                    val responseBody = response.body<ApiResponseList<Meeting>>()
+                    responseBody.toResult()
+                }
+                1 -> {
+                    val singleResponse = response.body<ApiResponse<Meeting>>()
+                    // 将单个对象转换为列表，然后使用 ApiResponseList 的 toResult 方法
+                    ApiResponseList(singleResponse.code, listOfNotNull(singleResponse.data), singleResponse.message).toResult()
+                }
+                else -> Result.failure(Exception("意外的响应代码: $code"))
+            }
         } catch (e: Exception) {
+            println("xunyidi signInPWD password ${e.message}")
             Result.failure(Exception("网络请求失败: ${e.message}"))
         }
     }
@@ -59,7 +78,7 @@ class AuthWithPWDRepositoryImpl @Inject constructor(
                     "typeEnum" to deviceType
                 ))
             }
-            println("getDeviceToken response:${deviceCode}| ${response.bodyAsText()}")
+            println("xunyidi updateDeviceToken response:${deviceCode}| ${response.bodyAsText()}")
 
             val responseBody = response.body<ApiResponse<DeviceInfo>>()
             responseBody.toResult()

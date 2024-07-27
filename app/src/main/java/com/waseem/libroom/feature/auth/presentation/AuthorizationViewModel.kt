@@ -1,10 +1,9 @@
 package com.waseem.libroom.feature.auth.presentation
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.waseem.libroom.feature.auth.domain.UpdateDeviceToken
+import com.waseem.libroom.feature.root.device.UniqueIdManager
 import com.waseem.libroom.feature.root.device.UpdateDeviceInfo
 import com.waseem.libroom.feature.root.domain.AuthState
 import com.waseem.libroom.feature.root.domain.UpdateAuthState
@@ -19,7 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthorizationViewModel @Inject constructor(
     private val updateAuthState: UpdateAuthState,
-    private val updateDeviceToken: UpdateDeviceToken
+    private val updateDeviceToken: UpdateDeviceToken,
+    private val uniqueIdManager: UniqueIdManager,
+    private val updateDeviceInfo: UpdateDeviceInfo
 ) : ViewModel() {
     // 加载状态
     private val _isLoading = MutableStateFlow(false)
@@ -29,12 +30,17 @@ class AuthorizationViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                val deviceCode =  uniqueIdManager.getUniqueId()
                 val result = updateDeviceToken(UpdateDeviceToken.Params(
                     EncryptionUtils.getDeviceType().toString(),
-                    EncryptionUtils.getUniqueDeviceCode()
+                    deviceCode
                 ))
-
                 if (result.isSuccess) {
+                    //更新deviceInfo
+                    val deviceInfo = result.getOrNull()
+                    if (deviceInfo != null) {
+                        updateDeviceInfo(UpdateDeviceInfo.Params(deviceInfo))
+                    }
                     setAuthState(AuthState.UNAUTHENTICATED)
                 } else {
                     setAuthState(AuthState.DEVICE_UNAUTHORIZED)
