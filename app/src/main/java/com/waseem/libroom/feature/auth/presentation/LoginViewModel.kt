@@ -1,6 +1,7 @@
 package com.waseem.libroom.feature.auth.presentation
 
 import com.waseem.libroom.core.BaseStateViewModel
+import com.waseem.libroom.feature.auth.domain.MeetingDataRepository
 import com.waseem.libroom.feature.auth.domain.SignInWithPassword
 import com.waseem.libroom.feature.auth.domain.UpdateDeviceToken
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val signInWithPassword: SignInWithPassword,
+    private val meetingDataRepository: MeetingDataRepository,
     reducer: LoginReducer
 ) : BaseStateViewModel<LoginAction, LoginResult, LoginEvent, LoginState, LoginReducer>(
     initialState = LoginState.DefaultState,
@@ -27,7 +29,10 @@ class LoginViewModel @Inject constructor(
                             account = email,
                             password = password
                         )
-                    ).onSuccess {
+                    ).onSuccess {meetings ->
+                        meetings.firstOrNull()?.let { meeting ->
+                            meetingDataRepository.setMeetingInfo(meeting)
+                        }
                         emit(LoginResult.Success)
                     }.onFailure {
                         emit(LoginResult.Failure(msg = it.message ?: "Something went wrong"))

@@ -5,6 +5,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.waseem.libroom.feature.auth.data.MeetingDataRepositoryImpl
+import com.waseem.libroom.feature.auth.domain.GetMeetingInfo
+import com.waseem.libroom.feature.auth.domain.GetMeetingInfoImpl
+import com.waseem.libroom.feature.auth.domain.MeetingDataRepository
+import com.waseem.libroom.feature.auth.domain.UpdateMeetingInfo
+import com.waseem.libroom.feature.auth.domain.UpdateMeetingInfoImpl
 import com.waseem.libroom.feature.author.data.AuthorRepositoryImpl
 import com.waseem.libroom.feature.author.domain.AuthorRepository
 import com.waseem.libroom.feature.book.data.BookRepositoryImpl
@@ -110,5 +116,20 @@ object AppModule {
     @Singleton
     fun provideUniqueIdManager(@ApplicationContext context: Context): UniqueIdManager {
         return UniqueIdManager(context)
+    }
+    // UpdateMeetingINfo
+    @Provides
+    fun provideUpdateMeetingInfo(dataStore: DataStore<Preferences>):MeetingDataRepository{
+        return MeetingDataRepositoryImpl(dataStore)
+    }
+
+    @Provides
+    fun provideGetMeetingInfo(meetingDataRepository: MeetingDataRepository):GetMeetingInfo{
+        return GetMeetingInfoImpl(meetingDataRepository)
+    }
+
+    @Provides
+    fun provideUpdateMeetingInfo(meetingDataRepository: MeetingDataRepository):UpdateMeetingInfo{
+        return UpdateMeetingInfoImpl(meetingDataRepository)
     }
 }

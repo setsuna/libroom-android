@@ -17,5 +17,4 @@ class SignInWithPasswordImpl(
             authWithPWDRepository.signInPWD(params.account,params.password)
         }
     }
-
 }
