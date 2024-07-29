@@ -119,7 +119,7 @@ object AppModule {
     }
     // UpdateMeetingINfo
     @Provides
-    fun provideUpdateMeetingInfo(dataStore: DataStore<Preferences>):MeetingDataRepository{
+    fun provideMeetingInfoRepository(dataStore: DataStore<Preferences>):MeetingDataRepository{
         return MeetingDataRepositoryImpl(dataStore)
     }
 
