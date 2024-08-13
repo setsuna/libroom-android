@@ -5,63 +5,81 @@ import com.waseem.libroom.core.mvi.MviEvent
 import com.waseem.libroom.core.mvi.MviResult
 import com.waseem.libroom.core.mvi.MviStateReducer
 import com.waseem.libroom.core.mvi.MviViewState
-import com.waseem.libroom.feature.meeting.domain.Meeting
 import javax.inject.Inject
 
 sealed class MeetingAction : MviAction {
     object Load : MeetingAction()
-    data class ToggleAgendaExpansion(val id: String) : MeetingAction()
-    //data class OpenDocument(val documentId: String) : MeetingAction()
+    data class ToggleAgendaExpand(val agendaId: String) : MeetingAction()
+    data class LoadDocuments(val agendaId: String) : MeetingAction()
+    data class OpenDocument(val documentId: String) : MeetingAction()
 }
 
 sealed class MeetingResult : MviResult {
     object Loading : MeetingResult()
-    data class Content(val meetingUiState: MeetingUiState) : MeetingResult()
-    object Error : MeetingResult()
+    data class MeetingContent(val meetingUiState: MeetingUiState) : MeetingResult()
+    data class DocumentsLoaded(val agendaId: String, val documents: List<DocumentUiState>) : MeetingResult()
+    object Failure : MeetingResult()
 }
 
 sealed class MeetingEvent : MviEvent {
-    data class NavigateToAgenda(val agendaId: String) : MeetingEvent()
-    data class NavigateToAttendeeList(val meetingId: String) : MeetingEvent()
     data class OpenDocument(val documentId: String) : MeetingEvent()
 }
 
 sealed class MeetingState : MviViewState {
-    object Loading : MeetingState()
-    data class Content(val meetingUiState: MeetingUiState) : MeetingState()
-    object Error : MeetingState()
+    object DefaultState : MeetingState()
+    object LoadingState : MeetingState()
+    data class MeetingContentState(val uiState: MeetingUiState) : MeetingState()
+    object ErrorState : MeetingState()
 }
 
 class MeetingReducer @Inject constructor() : MviStateReducer<MeetingState, MeetingResult> {
     override fun MeetingState.reduce(result: MeetingResult): MeetingState {
-        return when (val currentState = this) {
-            is MeetingState.Loading -> reduceFromLoading(result)
-            is MeetingState.Content -> reduceFromContent(currentState, result)
-            is MeetingState.Error -> reduceFromError(result)
+        return when (val previousState = this) {
+            is MeetingState.DefaultState -> previousState + result
+            is MeetingState.ErrorState -> previousState + result
+            is MeetingState.MeetingContentState -> previousState + result
+            is MeetingState.LoadingState -> previousState + result
         }
     }
 
-    private fun reduceFromLoading(result: MeetingResult): MeetingState {
+    private operator fun MeetingState.DefaultState.plus(result: MeetingResult): MeetingState {
         return when (result) {
-            is MeetingResult.Loading -> MeetingState.Loading
-            is MeetingResult.Content -> MeetingState.Content(result.meetingUiState)
-            is MeetingResult.Error -> MeetingState.Error
+            MeetingResult.Loading -> MeetingState.LoadingState
+            else -> throw IllegalStateException("unsupported")
         }
     }
 
-    private fun reduceFromContent(currentState: MeetingState.Content, result: MeetingResult): MeetingState {
+    private operator fun MeetingState.LoadingState.plus(result: MeetingResult): MeetingState {
         return when (result) {
-            is MeetingResult.Loading -> MeetingState.Loading
-            is MeetingResult.Content -> MeetingState.Content(result.meetingUiState)
-            is MeetingResult.Error -> MeetingState.Error
+            MeetingResult.Loading -> MeetingState.LoadingState
+            is MeetingResult.MeetingContent -> MeetingState.MeetingContentState(uiState = result.meetingUiState)
+            MeetingResult.Failure -> MeetingState.ErrorState
+            else -> throw IllegalStateException("unsupported")
         }
     }
 
-    private fun reduceFromError(result: MeetingResult): MeetingState {
+    private operator fun MeetingState.ErrorState.plus(result: MeetingResult): MeetingState {
         return when (result) {
-            is MeetingResult.Loading -> MeetingState.Loading
-            is MeetingResult.Content -> MeetingState.Content(result.meetingUiState)
-            is MeetingResult.Error -> MeetingState.Error
+            MeetingResult.Loading -> MeetingState.LoadingState
+            else -> throw IllegalStateException("unsupported")
+        }
+    }
+
+    private operator fun MeetingState.MeetingContentState.plus(result: MeetingResult): MeetingState {
+        return when (result) {
+            MeetingResult.Loading -> MeetingState.LoadingState
+            is MeetingResult.MeetingContent -> MeetingState.MeetingContentState(uiState = result.meetingUiState)
+            is MeetingResult.DocumentsLoaded -> {
+                val updatedAgendaItems = this.uiState.agendaItems.map { agendaItem ->
+                    if (agendaItem.id == result.agendaId) {
+                        agendaItem.copy(documents = result.documents, isLoading = false)
+                    } else {
+                        agendaItem
+                    }
+                }
+                MeetingState.MeetingContentState(this.uiState.copy(agendaItems = updatedAgendaItems))
+            }
+            else -> throw IllegalStateException("unsupported")
         }
     }
 }
