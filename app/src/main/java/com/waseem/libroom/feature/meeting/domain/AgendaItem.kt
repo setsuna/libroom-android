@@ -1,5 +1,8 @@
 package com.waseem.libroom.feature.meeting.domain
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AgendaItem(
     val creator: String,
     val gmtCreate: String,

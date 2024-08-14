@@ -71,11 +71,12 @@ class MeetingReducer @Inject constructor() : MviStateReducer<MeetingState, Meeti
             is MeetingResult.MeetingContent -> MeetingState.MeetingContentState(uiState = result.meetingUiState)
             is MeetingResult.DocumentsLoaded -> {
                 val updatedAgendaItems = this.uiState.agendaItems.map { agendaItem ->
-                    if (agendaItem.id == result.agendaId) {
+                    /*if (agendaItem.id == result.agendaId) {
                         agendaItem.copy(documents = result.documents, isLoading = false)
                     } else {
                         agendaItem
-                    }
+                    }*/
+                    agendaItem
                 }
                 MeetingState.MeetingContentState(this.uiState.copy(agendaItems = updatedAgendaItems))
             }

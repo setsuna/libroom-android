@@ -3,7 +3,7 @@ package com.waseem.libroom.feature.meeting.presentation
 import com.waseem.libroom.feature.auth.domain.Meeting
 import com.waseem.libroom.feature.meeting.domain.AgendaItem
 import com.waseem.libroom.feature.meeting.domain.Document
-import com.waseem.libroom.feature.meeting.domain.DocumentUiState
+import com.waseem.libroom.feature.meeting.domain.MeetingAgenda
 
 data class MeetingUiState(
     val meetingTitle: String,
@@ -11,7 +11,7 @@ data class MeetingUiState(
 )
 
 data class AgendaItemUiState(
-    val id: String,
+    val id: Int,
     val title: String,
     val isExpanded: Boolean,
     val isLoading: Boolean,
@@ -19,8 +19,8 @@ data class AgendaItemUiState(
 )
 
 data class DocumentUiState(
-    val id: String,
-    val title: String,
+    val id: Int,
+    val name: String,
     val fileType: FileType
 )
 
@@ -29,13 +29,13 @@ enum class FileType {
 }
 
 // Extension function to convert domain model to UI state
-fun Meeting.toUiState(): MeetingUiState = MeetingUiState(
-    meetingTitle = title,
-    agendaItems = agendaItems.map { it.toUiState() }
+fun MeetingAgenda.toUiState(): MeetingUiState = MeetingUiState(
+    meetingTitle = meetingTitle,
+    agendaItems = agendaList.map { it.toUiState() }
 )
 
 fun AgendaItem.toUiState(): AgendaItemUiState = AgendaItemUiState(
-    id = id,
+    id = issuesId,
     title = title,
     isExpanded = false,
     isLoading = false,
@@ -43,12 +43,12 @@ fun AgendaItem.toUiState(): AgendaItemUiState = AgendaItemUiState(
 )
 
 fun Document.toUiState(): DocumentUiState = DocumentUiState(
-    id = id,
-    title = title,
-    fileType = when (fileExtension.toLowerCase()) {
+    id = issueDocumentId,
+    name = name,
+    fileType = when (suffix) {
         "pdf" -> FileType.PDF
         "pptx" -> FileType.PPTX
         "docx" -> FileType.DOCX
-        else -> throw IllegalArgumentException("Unsupported file type: $fileExtension")
+        else -> FileType.UNKNOWN
     }
 )

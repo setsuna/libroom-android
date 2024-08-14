@@ -1,26 +1,35 @@
 package com.waseem.libroom.feature.meeting.presentation
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import com.waseem.libroom.R
 import com.waseem.libroom.core.compose.ErrorUi
 import com.waseem.libroom.core.compose.ScreenTitle
 import com.waseem.libroom.core.mvi.collectEvents
 import com.waseem.libroom.core.mvi.collectState
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun MeetingScreen(
@@ -73,10 +82,13 @@ fun MeetingContent(
     onOpenDocument: (String) -> Unit
 ) {
     LazyColumn {
-        items(uiState.agendaItems) { agendaItem ->
+        items(
+            items = uiState.agendaItems,
+            key = { agendaItem -> agendaItem.id }
+        ) { agendaItem ->
             AgendaItem(
                 agendaItem = agendaItem,
-                onToggleExpand = { onToggleAgendaExpand(agendaItem.id) },
+                onToggleExpand = { onToggleAgendaExpand(agendaItem.id.toString()) },
                 onOpenDocument = onOpenDocument
             )
         }
@@ -103,12 +115,12 @@ fun AgendaItem(
                 modifier = Modifier.weight(1f)
             )
             Icon(
-                imageVector = if (agendaItem.isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                imageVector = if (agendaItem.isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
                 contentDescription = if (agendaItem.isExpanded) "Collapse" else "Expand"
             )
         }
         if (agendaItem.isExpanded) {
-            agendaItem.documents.forEach { document ->
+            agendaItem.documents?.forEach { document ->
                 DocumentItem(document = document, onOpenDocument = onOpenDocument)
             }
         }
@@ -123,16 +135,17 @@ fun DocumentItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onOpenDocument(document.id) }
+            .clickable { onOpenDocument(document.id.toString()) }
             .padding(horizontal = 32.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(
                 id = when (document.fileType) {
-                    FileType.PDF -> R.drawable.ic_pdf
-                    FileType.PPTX -> R.drawable.ic_pptx
-                    FileType.DOCX -> R.drawable.ic_docx
+                    FileType.PDF -> R.drawable.ic_light_mode_filled
+                    FileType.PPTX -> R.drawable.ic_book
+                    FileType.DOCX -> R.drawable.ic_menu
+                    FileType.UNKNOWN -> R.drawable.ic_bookmark
                 }
             ),
             contentDescription = "File type icon",
@@ -140,7 +153,7 @@ fun DocumentItem(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = document.title,
+            text = document.name,
             style = MaterialTheme.typography.bodyMedium
         )
     }

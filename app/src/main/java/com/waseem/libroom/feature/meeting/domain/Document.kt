@@ -1,5 +1,8 @@
 package com.waseem.libroom.feature.meeting.domain
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Document(
     val documentId: Int,
     val isEditable: Boolean,
