@@ -10,7 +10,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MeetingViewModel @Inject constructor(
     private val getMeetingContent: GetMeetingContent,
-    private val getAgendaDocuments: GetAgendaDocuments,
+    //private val getAgendaDocuments: GetAgendaDocuments,
     reducer: MeetingReducer
 ) : BaseStateViewModel<MeetingAction, MeetingResult, MeetingEvent, MeetingState, MeetingReducer>(
     initialState = MeetingState.DefaultState,
@@ -63,14 +63,14 @@ class MeetingViewModel @Inject constructor(
     }
 
     private fun loadDocuments(agendaId: String): Flow<MeetingResult> = flow {
-        getAgendaDocuments(agendaId).fold(
+        /*getAgendaDocuments(agendaId).fold(
             onSuccess = { documents ->
                 emit(MeetingResult.DocumentsLoaded(agendaId, documents.map { it.toUiState() }))
             },
             onFailure = {
                 emit(MeetingResult.Failure)
             }
-        )
+        )*/
     }
 
     private fun openDocument(documentId: String): Flow<MeetingResult> = flow {

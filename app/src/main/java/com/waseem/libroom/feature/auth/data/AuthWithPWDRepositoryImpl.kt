@@ -1,6 +1,6 @@
 package com.waseem.libroom.feature.auth.data
 
-import android.util.Log
+
 import com.waseem.libroom.core.usecase.ApiResponse
 import com.waseem.libroom.core.usecase.ApiResponseList
 import com.waseem.libroom.core.usecase.NoParams
@@ -16,10 +16,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.int
