@@ -3,6 +3,8 @@ package com.waseem.libroom.feature.meeting.data
 import com.waseem.libroom.core.usecase.ApiResponse
 import com.waseem.libroom.core.usecase.ApiResponseList
 import com.waseem.libroom.core.usecase.toResult
+import com.waseem.libroom.feature.auth.domain.Meeting
+import com.waseem.libroom.feature.auth.domain.MeetingDataRepository
 import com.waseem.libroom.feature.meeting.domain.AgendaItem
 import com.waseem.libroom.feature.meeting.domain.Document
 import com.waseem.libroom.feature.meeting.domain.MeetingAgenda
@@ -13,6 +15,8 @@ import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
@@ -20,6 +24,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
 class MeetingAgendaRepositoryImpl @Inject constructor(
+    private val meetingDataRepository: MeetingDataRepository,
     private var httpClient: HttpClient
 ) : MeetingAgendaRepository {
     override suspend fun getAgendaItem(meetingId:String): Result<List<AgendaItem>> {
@@ -53,8 +58,43 @@ class MeetingAgendaRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getMeetingContent(): Result<MeetingAgenda> {
-        TODO("Not yet implemented")
+    override suspend fun getMeetingContent(meetingId: String): Result<Flow<MeetingAgenda>> {
+        return try {
+            // 获取议程项目
+            val agendaItemsResult = getAgendaItem(meetingId)
+
+            if (agendaItemsResult.isSuccess) {
+                val agendaItems = agendaItemsResult.getOrNull() ?: emptyList()
+
+                // 获取会议信息流
+                val meetingFlowResult = getMeetingTitle()
+
+                if (meetingFlowResult.isSuccess) {
+                    val meetingFlow = meetingFlowResult.getOrNull()
+                    if (meetingFlow != null) {
+                        // 将 Meeting 流转换为 MeetingAgenda 流
+                        val meetingAgendaFlow = meetingFlow.map { meeting ->
+                            MeetingAgenda(meeting., agendaItems)
+                        }
+                        Result.success(meetingAgendaFlow)
+                    } else {
+                        Result.failure(Exception("Meeting flow is null"))
+                    }
+                } else {
+                    Result.failure(Exception("Failed to fetch meeting information"))
+                }
+            } else {
+                Result.failure(Exception("Failed to fetch agenda items"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch meeting content: ${e.message}"))
+        }
     }
 
+    private suspend fun getMeetingTitle(): Result<Flow<Meeting>> {
+        // 这里应该实现获取会议标题的逻辑
+        // 为了示例，我们返回一个模拟的标题
+        val meeting : Flow<Meeting> = meetingDataRepository.getMeetingInfo()
+        return Result.success(meeting)
+    }
 }

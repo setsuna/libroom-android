@@ -1,5 +1,6 @@
 package com.waseem.libroom.feature.meeting.di
 
+import com.waseem.libroom.feature.auth.domain.MeetingDataRepository
 import com.waseem.libroom.feature.meeting.data.MeetingAgendaRepositoryImpl
 import com.waseem.libroom.feature.meeting.domain.GetAgendaItem
 import com.waseem.libroom.feature.meeting.domain.GetAgendaItemImpl
@@ -16,8 +17,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 object MeetingModule {
 
     @Provides
-    fun providesMeetingDataRepository(httpClient: HttpClient): MeetingAgendaRepository {
-        return MeetingAgendaRepositoryImpl(httpClient)
+    fun providesMeetingDataRepository(meetingDataRepository: MeetingDataRepository, httpClient: HttpClient): MeetingAgendaRepository {
+        return MeetingAgendaRepositoryImpl(meetingDataRepository,httpClient)
     }
 
     @Provides
