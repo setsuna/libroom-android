@@ -58,43 +58,23 @@ class MeetingAgendaRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getMeetingContent(meetingId: String): Result<Flow<MeetingAgenda>> {
-        return try {
-            // 获取议程项目
-            val agendaItemsResult = getAgendaItem(meetingId)
+    override suspend fun getMeetingContent(): Result<Flow<MeetingAgenda>> {
+        return  try {
+            val meetingFlow = getMeetingData().getOrThrow()
 
-            if (agendaItemsResult.isSuccess) {
-                val agendaItems = agendaItemsResult.getOrNull() ?: emptyList()
-
-                // 获取会议信息流
-                val meetingFlowResult = getMeetingTitle()
-
-                if (meetingFlowResult.isSuccess) {
-                    val meetingFlow = meetingFlowResult.getOrNull()
-                    if (meetingFlow != null) {
-                        // 将 Meeting 流转换为 MeetingAgenda 流
-                        val meetingAgendaFlow = meetingFlow.map { meeting ->
-                            MeetingAgenda(meeting., agendaItems)
-                        }
-                        Result.success(meetingAgendaFlow)
-                    } else {
-                        Result.failure(Exception("Meeting flow is null"))
-                    }
-                } else {
-                    Result.failure(Exception("Failed to fetch meeting information"))
-                }
-            } else {
-                Result.failure(Exception("Failed to fetch agenda items"))
-            }
+            Result.success(meetingFlow.map { meeting ->
+                val agendaItems = getAgendaItem(meeting.mid.toString()).getOrThrow()
+                MeetingAgenda(
+                    meetingTitle = meeting.name,
+                    agendaList = agendaItems
+                )
+            })
         } catch (e: Exception) {
-            Result.failure(Exception("Failed to fetch meeting content: ${e.message}"))
+            Result.failure(Exception("Failed to get meeting content: ${e.message}"))
         }
     }
 
-    private suspend fun getMeetingTitle(): Result<Flow<Meeting>> {
-        // 这里应该实现获取会议标题的逻辑
-        // 为了示例，我们返回一个模拟的标题
-        val meeting : Flow<Meeting> = meetingDataRepository.getMeetingInfo()
-        return Result.success(meeting)
+    private suspend fun getMeetingData(): Result<Flow<Meeting>> {
+        return meetingDataRepository.getMeetingInfo().let { Result.success(it) }
     }
 }
