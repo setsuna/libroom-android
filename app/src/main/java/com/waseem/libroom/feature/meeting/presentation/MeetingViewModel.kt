@@ -1,15 +1,17 @@
 package com.waseem.libroom.feature.meeting.presentation
 
 import com.waseem.libroom.core.BaseStateViewModel
-import com.waseem.libroom.core.usecase.NoParams
+import com.waseem.libroom.feature.home.domain.GetHomeContent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class MeetingViewModel @Inject constructor(
-    private val getMeetingContent: GetMeetingContent,
+    private val getHomeContent: GetHomeContent,
     //private val getAgendaDocuments: GetAgendaDocuments,
     reducer: MeetingReducer
 ) : BaseStateViewModel<MeetingAction, MeetingResult, MeetingEvent, MeetingState, MeetingReducer>(
@@ -30,9 +32,18 @@ class MeetingViewModel @Inject constructor(
     }
     private fun loadMeetingContent(): Flow<MeetingResult> = flow {
         emit(MeetingResult.Loading)
-        getMeetingContent(NoParams).fold(
-            onSuccess = { meetingContent ->
-                emit(MeetingResult.MeetingContent(meetingContent.toUiState()))
+        getMeetingContent().fold(
+            onSuccess = { meetingAgendaFlow ->
+                meetingAgendaFlow
+                    .map { meetingAgenda ->
+                    MeetingResult.MeetingContent(meetingAgenda.toUiState())
+                    }
+                    .catch {
+                        emit(MeetingResult.Failure)
+                    }
+                    .collect { result ->
+                        emit(result)
+                    }
             },
             onFailure = {
                 emit(MeetingResult.Failure)
@@ -40,7 +51,7 @@ class MeetingViewModel @Inject constructor(
         )
     }
     private fun toggleAgendaExpand(agendaId: String): Flow<MeetingResult> = flow {
-        val currentState = state.value as? MeetingState.MeetingContentState ?: return@flow
+        /*val currentState = state.value as? MeetingState.MeetingContentState ?: return@flow
         val updatedAgendaItems = currentState.uiState.agendaItems.map { item ->
             if (item.id == agendaId) {
                 val newExpandedState = !item.isExpanded
@@ -59,7 +70,7 @@ class MeetingViewModel @Inject constructor(
         val expandedItem = updatedAgendaItems.find { it.id == agendaId }
         if (expandedItem?.isExpanded == true && expandedItem.documents == null) {
             action(MeetingAction.LoadDocuments(agendaId))
-        }
+        }*/
     }
 
     private fun loadDocuments(agendaId: String): Flow<MeetingResult> = flow {
